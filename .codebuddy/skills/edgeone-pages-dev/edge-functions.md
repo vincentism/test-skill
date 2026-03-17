@@ -3,6 +3,8 @@
 V8-based lightweight functions running at the edge. Ideal for simple APIs, KV storage access, and ultra-low latency responses.
 
 > **Runtime:** V8 (like Cloudflare Workers) — NOT Node.js. Do NOT use Node.js built-ins or npm packages.
+>
+> ⚠️ `Response.json()` is **NOT available** in this V8 runtime. Always use `new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })` instead.
 
 ## Basic function
 
@@ -28,12 +30,17 @@ export function onRequest(context) {
 
 // Or use specific method handlers:
 export function onRequestGet(context) {
-  return Response.json({ users: [] });
+  return new Response(JSON.stringify({ users: [] }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 
-export function onRequestPost(context) {
+export async function onRequestPost(context) {
   const body = await context.request.json();
-  return Response.json({ created: true }, { status: 201 });
+  return new Response(JSON.stringify({ created: true }), {
+    status: 201,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 ```
 
@@ -64,7 +71,9 @@ export function onRequest(context) {
 
 export function onRequestGet(context) {
   const userId = context.params.id;
-  return Response.json({ userId });
+  return new Response(JSON.stringify({ userId }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 ```
 
@@ -93,7 +102,9 @@ export async function onRequest(context) {
   // Write
   await KV.put('page_views', String(newCount));
 
-  return Response.json({ views: newCount });
+  return new Response(JSON.stringify({ views: newCount }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 ```
 

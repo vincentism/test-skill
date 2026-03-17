@@ -113,7 +113,10 @@ export const config = {
 export function middleware(context) {
   const token = context.request.headers.get('Authorization');
   if (!token || !token.startsWith('Bearer ')) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
   return context.next();
 }
@@ -153,7 +156,9 @@ export function middleware(context) {
   const url = new URL(context.request.url);
 
   if (url.pathname === '/api/health') {
-    return Response.json({ status: 'ok', timestamp: Date.now() });
+    return new Response(JSON.stringify({ status: 'ok', timestamp: Date.now() }), {
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
   return context.next();
 }
